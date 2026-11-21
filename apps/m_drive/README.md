@@ -66,6 +66,10 @@ header's last tab. Everywhere else (the software renderer, the standard layout, 
 without touch routing) the page shows them as state, and the HMI's own bar has the nine buttons
 plus Settings, for touch and the controller.
 
+Keep **Renderer** on **Automatic** to use the native GPU path when available. The header shows
+**GPU** or **SOFTWARE**. The [hardware rendering guide](../../docs/hardware-rendering.md) explains
+installation, reported FPS, and checks on the head unit.
+
 ## Code
 
 `main.js` wires it together, `model.js` holds the domain (transport mode, the nine controls, what
@@ -84,7 +88,7 @@ node kit/tools/preview.js dist/m_drive preview wait=3 render                    
 node kit/tools/preview.js dist/m_drive preview wait=3 render --gpu preview/m_drive.bin   # + the renderer's stream
 node kit/tools/emu.js m_drive --preview-only        # live emulator: http://localhost:8077
 node kit/tools/test_m_drive.js                      # behaviour tests (stages its own copy; M_DRIVE_OUT=dir keeps frames)
-python3 kit/tools/build.py m_drive                  # installable dist/m_drive@1.0.0.mgu / .tgz: needs oap-sdk/
+python3 kit/tools/build.py m_drive                  # installable dist/m_drive@1.0.1.mgu / .tgz: needs oap-sdk/
 ```
 
 **SDK.** BMW's `oap-sdk` is not in this repository. Without it `build.py` only stages the app

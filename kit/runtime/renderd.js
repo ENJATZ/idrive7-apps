@@ -101,6 +101,7 @@ class RenderClient extends EventEmitter {
             this.inbuf = Buffer.alloc(0);   // (a message cut off with the last connection)
             s.setNoDelay && s.setNoDelay(true);
             this.native = false; this.info = null; this.area = null; this.onScreen = null;
+            this.stats = null;
             this.claimed = null;
             this._write(msg(M.HELLO, this._hello()));
             // upstream renderers take these before READY; they are sent again once READY came

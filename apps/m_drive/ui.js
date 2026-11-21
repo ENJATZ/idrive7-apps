@@ -37,7 +37,8 @@ function badge(v) {
 
 function draw(cv, G, t, v, act) {
     cv.clear(t.bg);
-    G.frame(cv, t, ['M Drive'], 0, [badge(v)]);
+    const native = v.rendering.backend === 'native';
+    G.frame(cv, t, ['M Drive'], 0, [badge(v), { text: native ? 'GPU' : 'SOFTWARE', color: native ? 'accent2' : 'warn' }]);
     const P = G.panel(cv, t, 24, G.TOP, W - 48, G.BOTTOM - G.TOP, null);
     const B = P.y + P.h;
     drawRpm(cv, G, t, v.telemetry.rpm);

@@ -2,7 +2,7 @@
   "id": "m_drive",
   "title": "M Drive",
   "description": "M Drive for BMW MGU ID7: engine speed, engine oil, coolant, gearbox oil, intake air and boost at a glance, with the MHD tune's map 1-4, the exhaust flap and Max Cooling. Opening it only reads; nothing is sent to the car unless Settings > Car controls is On, never with demo data",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "vendor": "custom",
   "loggingId": "OAA3",
   "iconGlyph": "rpm",
@@ -149,7 +149,7 @@
       "options": [
         [
           "auto",
-          "GPU 60 fps (default)"
+          "Automatic · GPU preferred"
         ],
         [
           "software",

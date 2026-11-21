@@ -44,6 +44,21 @@ mgu.run({
         };
         const controller = new Controller({ log: withoutVin(log), signals: lane.signals(ctx.signals), settings: shared, spec: ctx.spec });
         const repaint = () => { if (loop) loop.kick(); };
+        const rendering = () => {
+            const display = ctx.display, gpu = display.gpu;
+            if (display.active('MAIN')) {
+                const fps = gpu.stats && gpu.stats.fps;
+                return { backend: 'native', fps: Number.isFinite(fps) && fps >= 0 ? fps : null, reason: 'renderer active' };
+            }
+            const selected = (process.env.MGU_RENDERER || settings.get('renderer') || 'auto') === 'software';
+            return { backend: 'software', fps: null,
+                reason: selected ? 'selected' : gpu && gpu.ready ? 'renderer not displaying this app' : 'renderer unavailable or connecting' };
+        };
+        ctx.settingsRow({ label: 'Rendering status', value: () => {
+            const r = rendering();
+            return r.backend === 'native' ? 'Native renderer · ' + (r.fps === null ? 'FPS pending' : r.fps + ' fps reported')
+                : 'Software · ' + r.reason;
+        } });
 
         // a session lives for one phase (mode, link, screen shown): the next phase revokes its flap commands and
         // hold, so nothing asked for before a change goes after it
@@ -101,6 +116,7 @@ mgu.run({
             return {
                 mode: m,
                 link: linkUp(),
+                rendering: rendering(),
                 telemetry: telemetry.snapshot(),
                 commands: M.commandView({ mode: m, tune: session.tune.view(), flap: session.flap, flapNote: session.auto.note(), preview: session.preview,
                     last: session.last, rpm: telemetry.rpm() }),

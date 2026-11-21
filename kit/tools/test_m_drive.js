@@ -152,7 +152,11 @@ async function boot(o) {
     hu.ctx.signals = car.signals;
     const UI = require(path.join(JS, 'ui.js'));
     const draw = UI.draw;
-    UI.draw = function (cv, G, th, v, act) { views.push({ v, act, own: !!cv.own, targets: cv.targets }); return draw.apply(this, arguments); };
+    UI.draw = function (cv, G, th, v, act) {
+        const result = draw.apply(this, arguments);
+        views.push({ v, act, own: !!cv.own, targets: cv.targets, header: cv.chrome && cv.chrome.tabs });
+        return result;
+    };
     hu.start();
     await until('started and shown', () => logs.some((l) => /m_drive ready/.test(l)) && hu.ui.isVisible('MAIN') && views.length > 0);
     const app = current = {
@@ -527,6 +531,43 @@ async function queued() {
 }
 
 async function screen() {
+    await t('rendering status: automatic prefers native, reports daemon FPS, and clears it in Software or foreground fallback', async () => {
+        const app = await boot({ gpu: true, sets: { demo: 'on' } });
+        try {
+            await app.settled('native renderer active', (v) => v.rendering.backend === 'native');
+            const d = app.hu.display;
+            assert.strictEqual(app.hu.settings.get('renderer'), 'auto');
+            assert.deepStrictEqual(app.view().rendering, { backend: 'native', fps: null, reason: 'renderer active' });
+            assert.ok(app.views[app.views.length - 1].header.badges.some((b) => b.text === 'GPU'));
+            const rows = app.hu.settingsRows.filter((r) => r.label === 'Rendering status');
+            assert.strictEqual(rows.length, 1);
+            assert.strictEqual(rows[0].value(), 'Native renderer · FPS pending');
+
+            const stats = Buffer.alloc(20);
+            stats.writeUInt32LE(104, 0); stats.writeUInt32LE(12, 4);
+            stats.writeUInt32LE(57, 8); stats.writeUInt32LE(1100, 12); stats.writeUInt32LE(2200, 16);
+            d.gpu._data(stats);
+            await app.settled('daemon FPS displayed', (v) => v.rendering.fps === 57);
+            assert.strictEqual(rows[0].value(), 'Native renderer · 57 fps reported');
+
+            d.blocked = true;
+            await app.settled('foreground fallback', (v) => v.rendering.backend === 'software');
+            assert.deepStrictEqual(app.view().rendering, { backend: 'software', fps: null, reason: 'renderer not displaying this app' });
+            assert.strictEqual(rows[0].value(), 'Software · renderer not displaying this app');
+            d.gpu.ready = false;
+            await app.settled('renderer unavailable', (v) => v.rendering.reason === 'renderer unavailable or connecting');
+            assert.strictEqual(app.view().rendering.fps, null);
+            assert.strictEqual(rows[0].value(), 'Software · renderer unavailable or connecting');
+            d.gpu.ready = true;
+            d.blocked = false;
+            app.hu.settings.set('renderer', 'software');
+            await app.settled('software selected', (v) => v.rendering.reason === 'selected');
+            assert.deepStrictEqual(app.view().rendering, { backend: 'software', fps: null, reason: 'selected' });
+            assert.strictEqual(rows[0].value(), 'Software · selected');
+            assert.deepStrictEqual(app.car.sent, []);
+        } finally { app.done(); }
+    });
+
     await t('owned busy controls keep their rotary stops and OEM can queue a hand-back', async () => {
         const app = await boot({ gpu: true, sets: { controls: 'on' } });
         try {
@@ -603,6 +644,7 @@ async function screen() {
             const r = new Recorder(UI.W, UI.H, { textScale: 1.164 });
             r.own = true; r.extra = 49; r.chrome = { tabs: null };
             UI.draw(r, G, themes.theme('m_tricolour'), app.view(), app.views[app.views.length - 1].act);
+            assert.deepStrictEqual(r.chrome.tabs.badges.map((b) => b.text), ['DEMO', 'SOFTWARE']);
             assert.deepStrictEqual(r.targets.map((q) => q.key.replace('m_drive_', '')),
                 ['map1', 'map2', 'map3', 'map4', 'flapOem', 'flapOpen', 'flapClosed', 'coolingOn', 'coolingOff']);
             assert.ok(r.targets.every((q) => q.y + q.h <= UI.H + 49 && q.x >= 24 && q.x + q.w <= UI.W - 24), 'buttons inside the panel');

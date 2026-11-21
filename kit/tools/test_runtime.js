@@ -170,6 +170,27 @@ test('a connection cut in the middle of a message: the next connection\'s READY 
     } finally { g.close(); }
 });
 
+test('a renderer reconnect drops old FPS until the new connection reports statistics', async () => {
+    let connections = 0, current = null;
+    onConn = (c) => {
+        current = c;
+        ready(c);
+        if (++connections === 1) c.send(104, u32(57, 1100, 2200));
+    };
+    const g = new RenderClient('test', { info() {}, warn() {}, error() {} }, { native: true });
+    try {
+        g.connect();
+        assert(await waitFor(() => g.ready && g.stats), 'first renderer statistics received');
+        assert.strictEqual(g.stats.fps, 57);
+        assert.strictEqual(g.reconnect(), true);
+        assert(await waitFor(() => connections === 2 && g.ready), 'second renderer ready');
+        assert.strictEqual(g.stats, null, 'old FPS must not describe the new renderer');
+        current.send(104, u32(59, 900, 1800));
+        assert(await waitFor(() => g.stats), 'new renderer statistics received');
+        assert.deepStrictEqual(g.stats, { fps: 59, avgUs: 900, maxUs: 1800 });
+    } finally { g.close(); }
+});
+
 test('the one-time move to the new default theme: a theme picked on a fresh install stays', async () => {
     const src = fs.readFileSync(path.join(__dirname, '..', 'runtime', 'mgu.js'), 'utf8').replace(/\r\n/g, '\n');
     const cls = src.match(/class Settings[\s\S]*?\n}\n/)[0];      // (as hu-stub.js: the real class without the SDK)

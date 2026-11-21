@@ -41,6 +41,19 @@ diagnostic replies. It checks all nine actions, exact command bytes, command acc
 readings, demo mode, screen changes, the cooling RPM guard, and OEM hand-back while busy.
 CI runs the app checks on Node 8.16.2, the head unit's runtime, and Node 22.
 
+## Hardware rendering
+
+M Drive prefers the native GPU renderer automatically and falls back to the HMI's software image
+path when it is unavailable. The header identifies the active path. In the native full-screen
+settings sheet, **Rendering status** shows the renderer's reported FPS when available.
+Static screens intentionally send fewer frames; moving gauges follow the display callbacks,
+targeting up to 60 FPS.
+
+The native renderer and its prebuilt head-unit binary are included. Read
+[the hardware rendering guide](docs/hardware-rendering.md) for installation requirements,
+graphics-driver checks, and a repeatable host protocol benchmark. Actual car FPS requires a
+measurement on your head unit.
+
 ## Build for the head unit
 
 An installable package requires BMW's `oap-sdk`, extracted from your own head unit. The SDK,
@@ -54,7 +67,7 @@ python3 kit/tools/build.py m_drive
 python3 kit/tools/make_kit.py m_drive
 ```
 
-The app build creates `dist/m_drive@1.0.0.mgu` and its `.tgz` package. The car-kit command creates
+The app build creates `dist/m_drive@1.0.1.mgu` and its `.tgz` package. The car-kit command creates
 `dist/mgu-custom-apps/` with the installer and renderer. Follow the generated
 `dist/mgu-custom-apps/README.txt` for installation. [deploy/car/README.txt](deploy/car/README.txt)
 describes the head-unit commands.

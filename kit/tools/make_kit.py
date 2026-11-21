@@ -32,7 +32,8 @@ RENDERD_FILES = [('js/foreground_gate.js', 'foreground_gate.js'), ('js/hmi_templ
                  ('LICENSE', 'LICENSE'), ('LICENSE.mgu-renderd', 'LICENSE.mgu-renderd')]
 # files copied next to the apps; text, so always shipped with Unix line endings
 CAR_FILES = [('car/deploy-car.sh', 'deploy-car.sh'), ('mgu-app-install.sh', 'mgu-app-install.sh'),
-             ('mainapp-patch.js', 'mainapp-patch.js'), ('car/README.txt', 'README.txt')]
+             ('mainapp-patch.js', 'mainapp-patch.js'), ('car/README.txt', 'README.txt'),
+             ('car/renderer-status.sh', 'renderer-status.sh')]
 
 
 def source_hash(parts=(('src', None), ('inputgate', ('.cpp',)), ('protocol', ('.xml',)), ('docker', None), ('', ('Makefile',)))):
@@ -191,7 +192,7 @@ def main():
         renderd_files(OUT)
         if renderd_files(PRE_DIR): print('renderer: script files changed - updated kit/renderd/prebuilt/ (commit it)')
 
-    names = ['deploy-car.sh', 'mgu-app-install.sh', 'mainapp-patch.js'] + \
+    names = ['deploy-car.sh', 'mgu-app-install.sh', 'mainapp-patch.js', 'renderer-status.sh'] + \
             ['apps/' + n for n in sorted(os.listdir(os.path.join(OUT, 'apps')))] + (['mgu-renderd'] if rd else []) + (['mgu-inputgate.so'] if gate else []) + \
             ([d for _, d in RENDERD_FILES] if rd else [])
     with open(os.path.join(OUT, 'KIT_SUMS'), 'w', encoding='utf-8', newline='\n') as f:
