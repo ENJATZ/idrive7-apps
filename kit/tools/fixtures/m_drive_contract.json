@@ -1,0 +1,149 @@
+{
+  "source_repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
+  "source_commit": "1f9b0421bcfe514cd325b1bc178cb12ed6e2cadf",
+  "modules": {
+    "tune.js": {
+      "source": "apps/live_adjustments/tune.js",
+      "sha256": "cf4f556a9ca7f3e1ef9fe759552a27fb7c3f46663b21c9f3af400d601212cd7e"
+    },
+    "controller.js": {
+      "source": "apps/live_adjustments/controller.js",
+      "sha256": "fb9ce6215655ff69704ab7ad7fd74405a8452f3aabdeb0e70f89b5ffda6ad63e"
+    },
+    "auto.js": {
+      "source": "apps/live_adjustments/auto.js",
+      "sha256": "86e88bc3821967617729e6c88d2f8f461048ecb959d22b4819c6dd20b604c4bb"
+    },
+    "diaglink.js": {
+      "source": "apps/live_adjustments/diaglink.js",
+      "sha256": "9842401de8afe845f8597cd5d30250103a5e20284211ccfd3eac6651cbef987f"
+    },
+    "adapters.js": {
+      "source": "apps/live_adjustments/adapters.js",
+      "sha256": "75966db987b31f1d7da8b9d5d3eecd7e6900f043914d018c16692f9eb1fdd438"
+    },
+    "real_adapters.js": {
+      "source": "apps/live_adjustments/real_adapters.js",
+      "sha256": "4eea9ff729e01e52b170c6270f6c3c4f8e4000db7bf9431fdbb0afd2bfd18d3f"
+    },
+    "bm3_protocol.js": {
+      "source": "apps/live_adjustments/bm3_protocol.js",
+      "sha256": "04baf1e30e84a6d42634dc96ac091b589947eadc3cd519a5eb336b509c8434d5"
+    },
+    "bm3_profiles.js": {
+      "source": "apps/live_adjustments/bm3_profiles.js",
+      "sha256": "53438f1dcad22486f162f38ef6a41d332c54a5d11827c7c157c7f38fd78b3cbb"
+    }
+  },
+  "dme": {
+    "ecu": 18,
+    "iat": [
+      {
+        "did": "F40F",
+        "bytes": 1,
+        "at": 0,
+        "factor": 1,
+        "offset": -40,
+        "min": -40,
+        "max": 150
+      },
+      {
+        "did": "F477",
+        "bytes": 1,
+        "at": 1,
+        "factor": 1,
+        "offset": -40,
+        "min": -40,
+        "max": 150,
+        "note": "charge air cooler temperature, bank 1 sensor 1"
+      },
+      {
+        "obd": "0F",
+        "bytes": 1,
+        "at": 0,
+        "factor": 1,
+        "offset": -40,
+        "min": -40,
+        "max": 150,
+        "note": "the same PID with OBD service 01, for engine units that refuse F40F with NRC 31"
+      }
+    ],
+    "boost": [
+      {
+        "did": "F470",
+        "bytes": 2,
+        "at": 3,
+        "factor": 0.03125,
+        "offset": 0,
+        "min": 20,
+        "max": 600,
+        "note": "OBD PID 0x70 boost pressure control: actual boost pressure sensor A (absolute), 1/32 kPa"
+      },
+      {
+        "did": "F487",
+        "bytes": 2,
+        "at": 1,
+        "factor": 0.03125,
+        "offset": 0,
+        "min": 20,
+        "max": 600,
+        "note": "OBD PID 0x87 intake manifold absolute pressure sensor A, 1/32 kPa"
+      },
+      {
+        "did": "F40B",
+        "bytes": 1,
+        "at": 0,
+        "factor": 1,
+        "offset": 0,
+        "min": 20,
+        "max": 255,
+        "note": "OBD PID 0x0B intake manifold absolute pressure, kPa (max 255 = 1.5 bar boost)"
+      },
+      {
+        "obd": "0B",
+        "bytes": 1,
+        "at": 0,
+        "factor": 1,
+        "offset": 0,
+        "min": 20,
+        "max": 255,
+        "note": "OBD service 01 PID 0x0B (same as F40B)"
+      }
+    ],
+    "baro": [
+      {
+        "did": "F433",
+        "bytes": 1,
+        "at": 0,
+        "factor": 1,
+        "offset": 0,
+        "min": 50,
+        "max": 115,
+        "note": "OBD PID 0x33 barometric pressure, kPa (101.3 when not available)"
+      },
+      {
+        "obd": "33",
+        "bytes": 1,
+        "at": 0,
+        "factor": 1,
+        "offset": 0,
+        "min": 50,
+        "max": 115,
+        "note": "OBD service 01 PID 0x33 (same as F433)"
+      }
+    ],
+    "egs": [
+      {
+        "ecu": 24,
+        "did": "6000",
+        "bytes": 1,
+        "at": 0,
+        "factor": 1,
+        "offset": -40,
+        "min": -40,
+        "max": 160,
+        "note": "ZF 8HP (GSZFBCE) _GETRIEBEOELTEMPERATUR, deg C + 40 (idrive7-apps PR #29, read on a G22)"
+      }
+    ]
+  }
+}

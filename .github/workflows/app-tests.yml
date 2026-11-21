@@ -1,0 +1,35 @@
+name: M Drive checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['8.16.2', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 kit/tools/verify_repository.py
+      - run: node kit/tools/test_m_drive.js
+      - if: matrix.node == '22'
+        run: node kit/tools/test_bm3_protocol.js
+      - run: node kit/tools/test_dids.js
+      - run: node kit/tools/test_diag_options.js
+      - run: node kit/tools/test_engine.js
+      - if: matrix.node == '22'
+        run: node kit/tools/test_runtime.js
+      - run: python3 kit/tools/test_fit_to_unit.py
+      - run: python3 kit/tools/test_id8_ui.py
